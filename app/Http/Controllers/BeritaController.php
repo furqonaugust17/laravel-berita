@@ -79,8 +79,10 @@ class BeritaController extends Controller
     {
         $data = $request->validated();
 
-        $this->imageUploadService->deleteImages($berita->gambar);
-        $data['gambar'] = $this->imageUploadService->storeSingle($request->file('gambar'));
+        if ($request->file('gambar')) {
+            $this->imageUploadService->deleteImages($berita->gambar);
+            $data['gambar'] = $this->imageUploadService->storeSingle($request->file('gambar'));
+        }
         $berita->update($data);
 
         return redirect()->route('berita.index')->with('success', 'Berita Berhasil Diubah');
@@ -93,6 +95,9 @@ class BeritaController extends Controller
     {
         $this->imageUploadService->deleteImages($berita->gambar);
         $berita->delete();
-        return redirect()->route('berita.index')->with('success', 'Berita Berhasil Dihapus');
+        return response()->json([
+            'success' => true,
+            'message' => 'Berita Berhasil Dihapus',
+        ]);
     }
 }

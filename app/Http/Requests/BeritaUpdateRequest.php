@@ -25,6 +25,7 @@ class BeritaUpdateRequest extends FormRequest
             'judul'   => 'required|string|min:10|max:255',
             'berita'  => 'required|string|min:10',
             'author'  => 'required|string|max:100',
+            'gambar'  => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 
@@ -33,15 +34,18 @@ class BeritaUpdateRequest extends FormRequest
         return [
             'judul.required'   => 'Judul wajib diisi.',
             'judul.string'     => 'Judul harus berupa teks.',
+            'judul.min'        => 'Judul minimal 10 karakter.',
             'judul.max'        => 'Judul maksimal 255 karakter.',
 
             'berita.required'  => 'Berita wajib diisi.',
+            'berita.min'  => 'Berita minimal 10 karakter.',
             'berita.string'    => 'Berita harus berupa teks.',
 
             'author.required'  => 'Author wajib diisi.',
             'author.string'    => 'Author harus berupa teks.',
             'author.max'       => 'Author maksimal 100 karakter.',
 
+            'gambar.required'     => 'File harus diupload.',
             'gambar.image'     => 'File harus berupa gambar.',
             'gambar.mimes'     => 'Gambar harus bertipe jpeg, png, jpg, gif, atau svg.',
             'gambar.max'       => 'Ukuran gambar maksimal 2MB.',

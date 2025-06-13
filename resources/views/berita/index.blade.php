@@ -1,8 +1,10 @@
 @section('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.tailwindcss.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
 @endsection
 
 @section('script')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.tailwindcss.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -41,8 +43,8 @@
 
 
                             return `<div class="d-flex">
-                                        <a href="${uriEdit}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
-                                        <button type="button" class="btn btn-danger shadow btn-xs sharp" onclick="deleteData(${data})"><i class="fa fa-trash"></i></button>
+                                        <a href="${uriEdit}" class="bg-yellow-400 p-3 text-black rounded">Edit</a>
+                                        <button type="button" class="bg-red-500 p-3 text-white rounded" onclick="deleteData(${data})">Delete</button>
                                     </div>`
                         }
                     }
@@ -139,6 +141,7 @@
                             <thead
                                 class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
+                                    <th></th>
                                     <th>Judul</th>
                                     <th>Slug</th>
                                     <th>Author</th>
