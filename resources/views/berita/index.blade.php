@@ -32,6 +32,7 @@
                     },
                     {
                         data: 'created_at',
+                        name: 'created_at',
                     },
                     {
                         data: 'id',

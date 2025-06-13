@@ -30,7 +30,11 @@ class BeritaController extends Controller
 
         if (request()->ajax()) {
             $beritas = Berita::query();
-            return DataTables::of($beritas)->make();
+            return DataTables::of($beritas)->addColumn('created_at', function ($row) {
+                return \Carbon\Carbon::parse($row->created_at)->translatedFormat('d F Y');
+            })->filterColumn('created_at', function ($query, $keyword) {
+                $query->whereRaw("DATE_FORMAT(created_at, '%d %M %Y') LIKE ?", ["%{$keyword}%"]);
+            })->make();
         }
         return view('berita.index');
     }
