@@ -1,3 +1,120 @@
+@section('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.tailwindcss.css">
+@endsection
+
+@section('script')
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.tailwindcss.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#table-berita').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: "{{ url()->current() }}",
+                columns: [{
+                        data: null,
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'judul',
+                    },
+                    {
+                        data: 'slug',
+                    },
+                    {
+                        data: 'author',
+                    },
+                    {
+                        data: 'created_at',
+                    },
+                    {
+                        data: 'id',
+                        "render": function(data, type, row) {
+                            let uriEdit =
+                                "{{ route('berita.edit', ['berita' => ':id']) }}"
+                                .replace(
+                                    ':id', data);
+
+
+                            return `<div class="d-flex">
+                                        <a href="${uriEdit}" class="btn btn-primary shadow btn-xs sharp me-1"><i class="fas fa-pencil-alt"></i></a>
+                                        <button type="button" class="btn btn-danger shadow btn-xs sharp" onclick="deleteData(${data})"><i class="fa fa-trash"></i></button>
+                                    </div>`
+                        }
+                    }
+                ],
+                columnDefs: [{
+                    targets: 0,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                }],
+            });
+
+
+        });
+
+
+        function deleteData(id) {
+            Swal.fire({
+                title: "Anda Yakin?",
+                text: "Data akan terhapus pada sistem!!",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Hapus",
+                cancelButtonText: "Batal",
+            }).then((result) => {
+                if (result.value) {
+                    let uriDelete = "{{ route('berita.destroy', ['berita' => ':id']) }}".replace(':id',
+                        id);
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+                    });
+                    $.ajax({
+                        url: uriDelete,
+                        type: 'DELETE',
+                        success: function(data) {
+                            toastr.success(data.message, {
+                                closeButton: false,
+                                debug: false,
+                                newestOnTop: false,
+                                progressBar: true,
+                                positionClass: "toast-top-right",
+                                preventDuplicates: false,
+                                onclick: null,
+                                showDuration: 300,
+                                hideDuration: 1000,
+                                timeOut: 500,
+                                extendedTimeOut: 1000,
+                                showEasing: "swing",
+                                hideEasing: "linear",
+                                showMethod: "fadeIn",
+                                hideMethod: "fadeOut"
+                            })
+                            $('#table-berita').DataTable().ajax.reload()
+                        },
+                        error: function(data) {
+                            Swal.fire({
+                                title: "Error",
+                                text: "Ada Kesalahan Pada Server",
+                                type: "warning",
+                                confirmButtonColor: "#DD6B55",
+                                confirmButtonText: "Oke",
+                            })
+                        }
+                    })
+                }
+            });
+        }
+    </script>
+@endsection
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -18,54 +135,18 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white dark:bg-gray-800">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50 dark:bg-gray-700">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="table-berita">
+                            <thead
+                                class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Judul</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Slug</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Author</th>
-                                    <th
-                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                        Aksi</th>
+                                    <th>Judul</th>
+                                    <th>Slug</th>
+                                    <th>Author</th>
+                                    <th>Dibuat Pada</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
-                                @foreach ($beritas as $berita)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100">
-                                            {{ $berita->judul }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100">
-                                            {{ $berita->slug }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-gray-900 dark:text-gray-100">
-                                            {{ $berita->author }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="flex space-x-2">
-                                                <a href="{{ route('berita.edit', $berita->id) }}"
-                                                    class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400">
-                                                    Edit
-                                                </a>
-                                                <form action="{{ route('berita.destroy', $berita->id) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" onclick="return confirm('Yakin hapus?')"
-                                                        class="text-red-600 hover:text-red-900 dark:text-red-400">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforeach
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                             </tbody>
                         </table>
                     </div>

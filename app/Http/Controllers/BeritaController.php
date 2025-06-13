@@ -8,6 +8,7 @@ use App\Models\Berita;
 use App\Services\ImageUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class BeritaController extends Controller
 {
@@ -22,11 +23,16 @@ class BeritaController extends Controller
      */
     public function index()
     {
-        $beritas = Berita::all();
         if (Auth::user()->role == 'user') {
+            $beritas = Berita::all();
             return view('users.berita.index', compact('beritas'));
         }
-        return view('berita.index', compact('beritas'));
+
+        if (request()->ajax()) {
+            $beritas = Berita::query();
+            return DataTables::of($beritas)->make();
+        }
+        return view('berita.index');
     }
 
     /**
